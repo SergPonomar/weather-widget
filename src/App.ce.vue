@@ -3,16 +3,24 @@ import { provide, reactive, ref, watch, onMounted } from 'vue'
 import { getCurrent } from './utils/weatherApi'
 import type { Ref } from 'vue'
 
-const state = reactive(new Map())
+//const state = reactive(new Map())
 const userCities: Ref<Array<string>> = ref([])
 const comp = ref()
 
 onMounted(() => {
-  //console.log(comp.value)
-  comp.value.commentIds = [1,2,3]
+  if (localStorage["weather-widget"]) {
+    userCities.value = JSON.parse(localStorage["weather-widget"])
+  }
+  //Set 'selected-cities' props thru JS property
   comp.value.selected = userCities
-  console.log(comp)
 })
+
+//TO-DO: replace with closed event
+watch(userCities, (cities) => {
+  localStorage["weather-widget"] = JSON.stringify(cities)
+},{ deep: true })
+
+
 
 function addCityHandler(e: CustomEvent) {
   const city = e.detail[0]
@@ -33,15 +41,18 @@ function addCityHandler(e: CustomEvent) {
 
 function changePosition(e: CustomEvent) {
   const {oldIndex, newIndex} = e.detail[0]
-  const element = userCities.value.splice(oldIndex, 1)[0];
 
+  const element = userCities.value.splice(oldIndex, 1)[0];
   userCities.value.splice(newIndex, 0, element);
-  //console.log("changepos ", oldIndex, " ", newIndex)
 }
 </script>
 
 <template>
-  <!--div v-for="coor in state.keys()">{{coor}}</div-->
+  <city-weather
+    v-for="city in userCities"
+    :city="city"
+    :key="city"
+  />
   <settings-component>
     <selected-cities 
       ref="comp"
@@ -52,7 +63,8 @@ function changePosition(e: CustomEvent) {
 </template>
 
 <style>
-.pipa {
-  background: black;
+@import url('https://fonts.googleapis.com/css?family=Roboto+Condensed');
+* {
+  font-family: 'Roboto', sans-serif;
 }
 </style>

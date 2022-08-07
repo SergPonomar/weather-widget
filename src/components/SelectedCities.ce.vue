@@ -4,7 +4,6 @@ import type { Ref } from 'vue'
 import { getCities } from '../utils/weatherApi'
 
 const props = defineProps<{
-  commentIds?: Array<number>
   selected?: Ref<Array<string>>
 }>()
 
@@ -14,7 +13,6 @@ const emit = defineEmits<{
 
 const cities = computed(() => props.selected?.value)
 const divs = ref([])
-const dummy = ref()
 const container = ref()
 const selCity: Ref<number | null> = ref(null)
 const selCityInitial: Ref<number | null> = ref(null)
@@ -78,11 +76,6 @@ function drag(e: MouseEvent) {
     >
       {{JSON.parse(city).name}}, {{JSON.parse(city).country}}
     </div>
-    <div
-      ref="dummy"
-      class="selected-cities__dummy"
-    >
-    </div>
   </div>
 </template>
 
@@ -103,8 +96,5 @@ function drag(e: MouseEvent) {
 }
 .selected-cities__city:not(:last-child) {
   border-bottom: none;
-}
-.selected-cities__dummy {
-  position: absolute;
 }
 </style>

@@ -8,7 +8,7 @@ const getCities = function(query: string) {
 
 const getCurrent = function(coordinates: {lat: number, lon: number}) {
 	let {lat, lon} = coordinates
-	return fetch(`${CURRENT_API_URL}?lat=${lat}&lon=${lon}&appid=${API_KEY}`)
+	return fetch(`${CURRENT_API_URL}?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`)
 }
 
 export {getCities, getCurrent}
