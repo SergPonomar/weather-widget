@@ -1,19 +1,23 @@
 <script setup lang="ts">
-import { computed, ref, watch, onBeforeUpdate } from 'vue'
+import IconHamburger from './icons/IconHamburger.vue'
+import IconTrash from './icons/IconTrash.vue'
+import { computed, ref, watch, onBeforeUpdate, nextTick } from 'vue'
 import type { Ref } from 'vue'
-import { getCities } from '../utils/weatherApi'
+import { clamp } from '../utils/helpers'
 
 const props = defineProps<{
-  selected?: Ref<Array<string>>
+  selected?: Ref<string[]>
 }>()
 
 const emit = defineEmits<{
   (e: 'changepos', indexes: object): void
+  (e: 'deletecity', index: number): void
 }>()
 
 const cities = computed(() => props.selected?.value)
-const divs = ref([])
+const divs: Ref<Element[]> = ref([])
 const container = ref()
+const containerHeight: Ref<number | null> = ref(null)
 const selCity: Ref<number | null> = ref(null)
 const selCityInitial: Ref<number | null> = ref(null)
 const startY: Ref<number> = ref(0)
@@ -25,27 +29,52 @@ onBeforeUpdate(() => {
 
 watch(selCity, (newPos, oldPos) => {
   if (oldPos !== null && newPos !== null) {
-    const oldEL = divs.value[oldPos] as Element
-    const newEL = divs.value[newPos] as Element
-    newEL.classList.add("selected-cities__city_selected")
-    oldEL.classList.remove("selected-cities__city_selected")
     emit('changepos', {oldIndex: oldPos, newIndex: newPos})
   }
 })
 
-function dragStart(e: MouseEvent, i: number) {
-  selCity.value = i
-  selCityInitial.value = i
-  startY.value = e.clientY
+//Set container animation
+watch(() => cities.value?.length, (newLen, oldLen) => {
+  if (newLen !== undefined && oldLen !== undefined && newLen < oldLen) {
+    containerHeight.value = container.value.offsetHeight
+    nextTick(() => {
+      if (containerHeight.value && newLen !== 0) {
+        containerHeight.value -= elHeight.value
+      }
+      setTimeout(() => containerHeight.value = null, 500)
+    })
+  }
+})
 
-  container.value.addEventListener("mousemove", drag)
-  const target = e.target as Element
-  elHeight.value = target.getBoundingClientRect().height
-  target.classList.add("selected-cities__city_selected")
+function dragStart(e: MouseEvent | TouchEvent, i: number) {
+  if (divs.value.length > 1) {
+    selCity.value = i
+    selCityInitial.value = i
+    if (e instanceof MouseEvent) {
+      startY.value = e.clientY
+      container.value.addEventListener("mousemove", drag)
+    } else if (e instanceof TouchEvent) {
+      startY.value = e.touches[0].clientY
+      container.value.addEventListener("touchmove", drag)
+    }
+
+    container.value.classList.add("selected-cities_moved")
+
+    const el = divs.value[i] as Element
+    elHeight.value = el.getBoundingClientRect().height
+    el.classList.add("selected-cities__city_selected")
+  }
 }
 
-function dragEnd(e: Event) {
-  container.value.removeEventListener("mousemove", drag)
+function dragEnd(e: MouseEvent | TouchEvent) {
+  if (e instanceof MouseEvent) {
+    container.value.removeEventListener("mousemove", drag)
+  } else if (e instanceof TouchEvent) {
+    container.value.removeEventListener("touchmove", drag)
+  }
+
+  container.value.classList.remove("selected-cities_moved")
+
   divs.value.forEach((el: Element) => {
     el.classList.remove("selected-cities__city_selected")
   })
@@ -53,48 +82,131 @@ function dragEnd(e: Event) {
   selCityInitial.value = null
 }
 
-function drag(e: MouseEvent) {
-  const dY = e.clientY - startY.value
+function drag(e: MouseEvent | TouchEvent) {
+  let yPos = startY.value;
+  if (e instanceof MouseEvent) {
+    yPos = e.clientY  
+  } else if (e instanceof TouchEvent) {
+    yPos = e.touches[0].clientY  
+  }
+  const dY = yPos - startY.value
   const dPos = Math.trunc(dY/elHeight.value)
   if (selCity.value !== null && selCityInitial.value !== null) {
-    selCity.value = selCityInitial.value + dPos
+    selCity.value = clamp(selCityInitial.value + dPos, 0, divs.value.length-1)
   }
+}
+
+function deleteHandler(i: number) {
+  elHeight.value = divs.value[i].getBoundingClientRect().height
+  emit('deletecity', i)
 }
 </script>
 
 <template>
   <div 
     class="selected-cities"
-    ref="container"
     @mouseup="dragEnd"
+    @touchend="dragEnd"
   >
+    <h1 class="selected-cities__title">Settings</h1>
     <div 
-      v-for="(city, i) in cities"
-      class="selected-cities__city"
-      :ref="el => { if (el) divs[i] = el }"
-      @mousedown="(e) => dragStart(e, i)"
+      ref="container"
+      class="selected-cities__container"
+      :style="`height:${containerHeight}px;`" 
     >
-      {{JSON.parse(city).name}}, {{JSON.parse(city).country}}
+      <TransitionGroup name="fade" tag="div"> 
+        <div 
+          v-if="!cities?.length"
+          class="selected-cities__no-city"
+        >
+          <span>No city selected</span>
+        </div>
+        <div 
+          class="selected-cities__city-wrapper"
+          v-for="(city, i) in cities"
+          :key="city"
+          :ref="el => { if (el) divs[i] = el as Element}"
+        >
+          <div class="selected-cities__city">
+            <IconHamburger
+              class="selected-cities__dragger"
+              @mousedown="(e) => dragStart(e, i)"
+              @touchstart="(e) => dragStart(e, i)"
+            />
+            <span>{{JSON.parse(city).name}}, {{JSON.parse(city).country}}</span>
+            <IconTrash 
+              class="selected-cities__delete"
+              @click="deleteHandler(i)"
+            />
+          </div>
+        </div>
+      </TransitionGroup>
     </div>
   </div>
 </template>
 
 <style>
-.selected-cities {
-  width: 300px;
+.selected-cities__no-city {
+  padding: 0 5px;
+  padding-bottom: 5px;
+  font-style: italic;
+  color: hsl(0, 0%, 60%);
+}
+.selected-cities__title {
+  padding: 0 5px;
+  font-size: 16px;
+  color: hsl(0, 0%, 40%);
+}
+.selected-cities_moved {
+  cursor: move;
 }
 .selected-cities__city {
   display: flex;
   align-items: center;
-  background: DeepSkyBlue;
-  height: 30px;
-  border: 1px solid black;
+  gap: 10px;
+  padding: 10px;
   user-select: none;
+  border: 1px solid #d2dbf9;
+  border-radius: 5px;
+}
+.selected-cities__city-wrapper {
+  padding: 5px 0;
+  width: 100%;
 }
 .selected-cities__city_selected {
   opacity: 0.5;
 }
-.selected-cities__city:not(:last-child) {
-  border-bottom: none;
+.selected-cities__dragger {
+  color: hsl(0, 0%, 40%);
+  cursor: move;
+}
+.selected-cities__delete {
+  margin-left: auto;
+  color: hsl(0, 0%, 40%);
+  cursor: pointer;
+}
+.selected-cities__container {
+  position: relative;
+  transition: height 0.5s ease;
+}
+
+/* declare transition */
+.fade-move {
+  transition: all 0.5s ease;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: all 0.5s cubic-bezier(0.55, 0, 0.1, 1);
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+  transform: scaleY(0.01);
+}
+
+.fade-leave-active {
+  position: absolute;
 }
 </style>

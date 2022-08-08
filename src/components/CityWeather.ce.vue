@@ -72,7 +72,6 @@ function getCurrentWeather() {
 	  .then((res) => res.json())
 	  .then((res) => {
 	    cityWeather.value = res
-			console.log(cityWeather.value)
 	  })
 }
 </script>
@@ -140,7 +139,20 @@ function getCurrentWeather() {
 	display: flex;
 	align-items: center;
 	flex: 1;
-	min-width: 100px;
+	min-width: 110px;
 	white-space: nowrap;
+}
+@media only screen and (max-width: 270px) {
+  .city-weather__temperature {
+		font-size: 30px;
+		margin: 10px 0;
+	}
+	.city-weather__description {
+		text-align: center;
+	}
+	.city-weather__properties, .city-weather__header {
+		flex-direction: column;
+		align-items: center;
+	}
 }
 </style>

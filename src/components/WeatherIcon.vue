@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import Icon01d from './icons/Icon01d.vue'
 import Icon01n from './icons/Icon01n.vue'
 import Icon02d from './icons/Icon02d.vue'
+import Icon02n from './icons/Icon02n.vue'
 import Icon03d03n from './icons/Icon03d03n.vue'
 import Icon04d04n from './icons/Icon04d04n.vue'
 import Icon09d09n from './icons/Icon09d09n.vue'
@@ -24,6 +25,8 @@ const icon = computed(() => {
 			return Icon01n
 		case '02d':
 			return Icon02d
+		case '02n':
+			return Icon02n
 		case '03d':
 		case '03n':
 			return Icon03d03n
