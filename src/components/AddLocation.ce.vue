@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import type { Ref } from 'vue'
 import { getCities } from '../utils/weatherApi'
 
 interface City {
   name: string
   country: string
+  lat: string
+  lon: string
 }
 
 const emit = defineEmits<{
@@ -44,13 +46,14 @@ function handler(city: City) {
       Add location:
     </h2>
     <input 
-      class="add-location__input"
       v-model="inputValue"
+      class="add-location__input"
       placeholder="search city"
-    />
+    >
     <div 
-      class="add-location__option"
       v-for="city in cityList"
+      :key="city.lat + '/' + city.lon"
+      class="add-location__option"
       @click="handler(city)"
     >
       {{ city.name }}, {{ city.country }}

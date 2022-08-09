@@ -14,8 +14,9 @@ module.exports = {
     "plugin:json/recommended",
     "plugin:md/recommended"
   ],
+  "parser": "vue-eslint-parser",
   "parserOptions": {
-    "ecmaVersion": 2021
+    "ecmaVersion": 2017
   },
   "plugins": [
     "@html-eslint",

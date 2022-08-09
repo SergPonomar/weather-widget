@@ -3,32 +3,32 @@ import WeatherIcon from './WeatherIcon.vue'
 import IconWind from './icons/IconWind.vue'
 import IconBarometer from './icons/IconBarometer.vue'
 
-import { computed, ref, reactive, onMounted } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { getCurrent } from '../utils/weatherApi'
 import { firstToUpperCase } from '../utils/helpers'
 import { msToBeufortDesc, degToDirection } from '../utils/weatherLUTs'
 import type { Ref } from 'vue'
 
 const props = defineProps<{
-  city: string
+	city: string
 }>()
 
 interface Weather {
-  weather: { 
-  	description: string
-  	icon: string
+	weather: {
+		description: string
+		icon: string
 	}[]
-  main: {
-  	feels_like: number
-  	temp: number
-  	pressure: number
-  	humidity: number
-  }
-  wind: {
-  	speed: number
-  	deg: number
-  }
-  visibility: number
+	main: {
+		feels_like: number
+		temp: number
+		pressure: number
+		humidity: number
+	}
+	wind: {
+		speed: number
+		deg: number
+	}
+	visibility: number
 }
 
 const cityWeather: Ref<Weather | null> = ref(null)
@@ -36,22 +36,22 @@ const cityWeather: Ref<Weather | null> = ref(null)
 const cityObj = computed(() => JSON.parse(props.city))
 
 const temperature = computed(() => {
-	return cityWeather.value !== null? 
+	return cityWeather.value !== null?
 		Math.round(cityWeather.value.main.temp) + "°C": null
 })
 
 const description = computed(() => {
-	return cityWeather.value !== null? 
+	return cityWeather.value !== null?
 		"Feels like " + 
-		Math.round(cityWeather.value.main.feels_like) + "°C. " + 
-		firstToUpperCase(cityWeather.value.weather[0].description) + ". " + 
+		Math.round(cityWeather.value.main.feels_like) + "°C. " +
+		firstToUpperCase(cityWeather.value.weather[0].description) + ". " +
 		msToBeufortDesc(cityWeather.value.wind.speed)
 		: null
 })
 
 const wind = computed(() => {
 	return cityWeather.value !== null?
-		cityWeather.value.wind.speed.toFixed(1) + " m/s " + 
+		cityWeather.value.wind.speed.toFixed(1) + " m/s " +
 		degToDirection(cityWeather.value.wind.deg)
 		: null
 })
@@ -69,46 +69,52 @@ onMounted(() => {
 function getCurrentWeather() {
 	const {lat, lon} = cityObj.value
 	getCurrent({lat, lon})
-	  .then((res) => {
-	  	if (res.ok) return res.json()
-	  })
-	  .then((res) => {
-	    cityWeather.value = res
-	  })
+		.then((res) => {
+			if (res.ok) return res.json()
+		})
+		.then((res) => {
+			cityWeather.value = res
+		})
 }
 </script>
 
 <template>
-	<div class="city-weather">
-		<h1 class="city-weather__title">{{cityObj.name}}, {{cityObj.country}}</h1>
-		<div 
-			v-if="cityWeather"
-			class="city-weather__card"
-		>
-			<div class="city-weather__header">
-				<WeatherIcon :iconId="cityWeather.weather[0].icon"/>
-				<h2 class="city-weather__temperature">{{temperature}}</h2>
-			</div>
-			<p class="city-weather__description">{{description}}</p>
-			<ul class="city-weather__properties">
-				<li class="city-weather__property">
-					<IconWind />
-					<span>{{wind}}</span>
-				</li>
-				<li class="city-weather__property">
-					<IconBarometer />
-					<span>{{cityWeather.main.pressure}} hPa</span>
-				</li>
-				<li class="city-weather__property">
-					<span>Humidity: {{cityWeather.main.humidity}}%</span>
-				</li>
-				<li class="city-weather__property">
-					<span>{{visibility}}</span>
-				</li>
-			</ul>
-		</div>
-		<ce-loader v-else />
-	</div>
+  <div class="city-weather">
+    <h1 class="city-weather__title">
+      {{ cityObj.name }}, {{ cityObj.country }}
+    </h1>
+    <div 
+      v-if="cityWeather"
+      class="city-weather__card"
+    >
+      <div class="city-weather__header">
+        <WeatherIcon :icon-id="cityWeather.weather[0].icon" />
+        <h2 class="city-weather__temperature">
+          {{ temperature }}
+        </h2>
+      </div>
+      <p class="city-weather__description">
+        {{ description }}
+      </p>
+      <ul class="city-weather__properties">
+        <li class="city-weather__property">
+          <IconWind />
+          <span>{{ wind }}</span>
+        </li>
+        <li class="city-weather__property">
+          <IconBarometer />
+          <span>{{ cityWeather.main.pressure }} hPa</span>
+        </li>
+        <li class="city-weather__property">
+          <span>Humidity: {{ cityWeather.main.humidity }}%</span>
+        </li>
+        <li class="city-weather__property">
+          <span>{{ visibility }}</span>
+        </li>
+      </ul>
+    </div>
+    <ce-loader v-else />
+  </div>
 </template>
 
 <style>
@@ -146,7 +152,7 @@ function getCurrentWeather() {
 	white-space: nowrap;
 }
 @media only screen and (max-width: 270px) {
-  .city-weather__temperature {
+	.city-weather__temperature {
 		font-size: 30px;
 		margin: 10px 0;
 	}

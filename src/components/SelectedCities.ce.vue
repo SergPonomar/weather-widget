@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import IconHamburger from './icons/IconHamburger.vue'
 import IconTrash from './icons/IconTrash.vue'
-import { computed, ref, watch, onBeforeUpdate, nextTick } from 'vue'
+import { ref, watch, onBeforeUpdate, nextTick } from 'vue'
 import type { Ref } from 'vue'
 import { clamp } from '../utils/helpers'
 
@@ -14,7 +14,6 @@ const emit = defineEmits<{
   (e: 'deletecity', index: number): void
 }>()
 
-//const cities = computed(() => props.selected?.value)
 const divs: Ref<Element[]> = ref([])
 const container: Ref<HTMLElement | undefined> = ref()
 const containerHeight: Ref<number | undefined> = ref()
@@ -22,7 +21,6 @@ const selCity: Ref<number | null> = ref(null)
 const selCityInitial: Ref<number | null> = ref(null)
 const startY: Ref<number> = ref(0)
 const elHeight: Ref<number> = ref(0)
-
 
 onBeforeUpdate(() => {
   divs.value = []
@@ -122,11 +120,14 @@ function deleteHandler(i: number) {
       class="selected-cities__container"
       :style="`height:${containerHeight}px;`" 
     >
-      <TransitionGroup name="fade" tag="div"> 
+      <TransitionGroup
+        name="fade"
+        tag="div"
+      > 
         <div 
           v-if="!selected?.length"
-          class="selected-cities__no-city"
           key="no-city"
+          class="selected-cities__no-city"
         >
           <span>No city selected</span>
         </div>
