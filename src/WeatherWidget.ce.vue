@@ -43,7 +43,7 @@ function addCityHandler(e: CustomEvent) {
   const city = e.detail[0]
   const cityKey = JSON.stringify(city)
   if (!userCities.value.includes(cityKey)) {
-    userCities.value.push(cityKey)
+    userCities.value = userCities.value.concat([cityKey])
   }
 }
 
