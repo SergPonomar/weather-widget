@@ -107,6 +107,7 @@ function getCurrentWeather() {
 				</li>
 			</ul>
 		</div>
+		<ce-loader v-else />
 	</div>
 </template>
 
