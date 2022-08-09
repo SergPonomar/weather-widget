@@ -6,8 +6,8 @@ import CityWeather from './components/CityWeather.ce.vue'
 import SettingsButton from './components/SettingsButton.ce.vue'
 
 //register custom elements
+customElements.define('ce-add-location', defineCustomElement(AddLocation))
+customElements.define('ce-selected-cities', defineCustomElement(SelectedCities))
+customElements.define('ce-city-weather', defineCustomElement(CityWeather))
+customElements.define('ce-settings-button', defineCustomElement(SettingsButton))
 customElements.define('weather-widget', defineCustomElement(App))
-customElements.define('add-location', defineCustomElement(AddLocation))
-customElements.define('selected-cities', defineCustomElement(SelectedCities))
-customElements.define('city-weather', defineCustomElement(CityWeather))
-customElements.define('settings-button', defineCustomElement(SettingsButton))

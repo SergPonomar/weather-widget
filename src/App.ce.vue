@@ -3,25 +3,25 @@ import { provide, reactive, ref, watch, onMounted } from 'vue'
 import { getCurrent, getNameByCoords } from './utils/weatherApi'
 import type { Ref } from 'vue'
 
-//const state = reactive(new Map())
 const userCities: Ref<Array<string>> = ref([])
 const settingsIsOpen: Ref<boolean> = ref(false)
-const selCities = ref()
+const selCities: Ref<Element | null> = ref(null)
 const closeButton = ref()
 
 onMounted(() => {
   if (localStorage["weather-widget"]) {
     userCities.value = JSON.parse(localStorage["weather-widget"])
-    console.log(userCities.value)
     if (userCities.value.length === 0) settingsIsOpen.value = true
   } else {
     getUserLocation()
   }
   //Set custom elements props thru JS property
-  selCities.value.selected = userCities
-  closeButton.value.closed = settingsIsOpen
+  //selCities.value.selected = userCities
+  //console.log(selCities.props)
+  //closeButton.value.closed = settingsIsOpen
 })
 
+//Store new position in localStorage
 watch(userCities, (cities) => {
   localStorage["weather-widget"] = JSON.stringify(cities)
 },{ deep: true })
@@ -72,23 +72,25 @@ function settingToggle(e: CustomEvent) {
 
 <template>
   <div class="app">  
-    <settings-button 
+    <ce-settings-button 
       ref="closeButton"
+      :closed="settingsIsOpen"
       @toggle="settingToggle"
     />     
-    <city-weather
+    <ce-city-weather
       v-show="!settingsIsOpen"
       v-for="city in userCities"
       :city="city"
       :key="city"
     />
     <div v-show="settingsIsOpen">
-      <selected-cities 
+      <ce-selected-cities 
         ref="selCities"
+        :selected="userCities"
         @changepos="changePosition"
         @deletecity="deleteCityHandler"
       />
-      <add-location 
+      <ce-add-location 
         @addcity="addCityHandler"
       />
     </div>

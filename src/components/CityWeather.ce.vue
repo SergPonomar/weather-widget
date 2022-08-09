@@ -69,7 +69,9 @@ onMounted(() => {
 function getCurrentWeather() {
 	const {lat, lon} = cityObj.value
 	getCurrent({lat, lon})
-	  .then((res) => res.json())
+	  .then((res) => {
+	  	if (res.ok) return res.json()
+	  })
 	  .then((res) => {
 	    cityWeather.value = res
 	  })
@@ -115,7 +117,7 @@ function getCurrentWeather() {
 	color: hsl(0, 0%, 40%);
 }
 .city-weather__card {
-	padding: 0 5px 5px 5px;
+	padding: 0 10px 5px 10px;
 	font-size: 14px;
 	border: 1px solid #d2dbf9;
 	border-radius: 5px;

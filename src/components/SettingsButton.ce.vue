@@ -5,14 +5,14 @@ import IconSettings from './icons/IconSettings.vue'
 import IconClose from './icons/IconClose.vue'
 
 const props = defineProps<{
-  closed?: Ref<boolean>
+  closed?: boolean | string
 }>()
 
 const emit = defineEmits<{
   (e: 'toggle'): void
 }>()
 
-const isClosed = computed(() => props.closed?.value)
+//const isClosed = computed(() => props.closed?.value)
 
 function handler() {
   emit('toggle')
@@ -24,7 +24,7 @@ function handler() {
     class="settings-button"
     @click="handler"
   >
-    <IconSettings v-if="!isClosed" />
+    <IconSettings v-if="!closed" />
     <IconClose v-else />
   </button>
 </template>

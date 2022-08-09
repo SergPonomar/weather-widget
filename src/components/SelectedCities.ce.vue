@@ -6,7 +6,7 @@ import type { Ref } from 'vue'
 import { clamp } from '../utils/helpers'
 
 const props = defineProps<{
-  selected?: Ref<string[]>
+  selected?: string[] | string
 }>()
 
 const emit = defineEmits<{
@@ -14,19 +14,21 @@ const emit = defineEmits<{
   (e: 'deletecity', index: number): void
 }>()
 
-const cities = computed(() => props.selected?.value)
+//const cities = computed(() => props.selected?.value)
 const divs: Ref<Element[]> = ref([])
-const container = ref()
-const containerHeight: Ref<number | null> = ref(null)
+const container: Ref<HTMLElement | undefined> = ref()
+const containerHeight: Ref<number | undefined> = ref()
 const selCity: Ref<number | null> = ref(null)
 const selCityInitial: Ref<number | null> = ref(null)
 const startY: Ref<number> = ref(0)
 const elHeight: Ref<number> = ref(0)
 
+
 onBeforeUpdate(() => {
   divs.value = []
 })
 
+//Emit event on change position of city
 watch(selCity, (newPos, oldPos) => {
   if (oldPos !== null && newPos !== null) {
     emit('changepos', {oldIndex: oldPos, newIndex: newPos})
@@ -34,17 +36,21 @@ watch(selCity, (newPos, oldPos) => {
 })
 
 //Set container animation
-watch(() => cities.value?.length, (newLen, oldLen) => {
+watch(() => props.selected?.length, (newLen, oldLen) => {
   if (newLen !== undefined && oldLen !== undefined && newLen < oldLen) {
-    containerHeight.value = container.value.offsetHeight
+    containerHeight.value = container.value?.offsetHeight
     nextTick(() => {
       if (containerHeight.value && newLen !== 0) {
         containerHeight.value -= elHeight.value
       }
-      setTimeout(() => containerHeight.value = null, 500)
+      setTimeout(() => containerHeight.value = undefined, 500)
     })
   }
 })
+
+function cityName(city: string) {
+  return city? JSON.parse(city).name + ', ' + JSON.parse(city).country: ""
+}
 
 function dragStart(e: MouseEvent | TouchEvent, i: number) {
   if (divs.value.length > 1) {
@@ -52,13 +58,13 @@ function dragStart(e: MouseEvent | TouchEvent, i: number) {
     selCityInitial.value = i
     if (e instanceof MouseEvent) {
       startY.value = e.clientY
-      container.value.addEventListener("mousemove", drag)
+      container.value?.addEventListener("mousemove", drag)
     } else if (e instanceof TouchEvent) {
       startY.value = e.touches[0].clientY
-      container.value.addEventListener("touchmove", drag)
+      container.value?.addEventListener("touchmove", drag)
     }
 
-    container.value.classList.add("selected-cities_moved")
+    container.value?.classList.add("selected-cities_moved")
 
     const el = divs.value[i] as Element
     elHeight.value = el.getBoundingClientRect().height
@@ -68,12 +74,12 @@ function dragStart(e: MouseEvent | TouchEvent, i: number) {
 
 function dragEnd(e: MouseEvent | TouchEvent) {
   if (e instanceof MouseEvent) {
-    container.value.removeEventListener("mousemove", drag)
+    container.value?.removeEventListener("mousemove", drag)
   } else if (e instanceof TouchEvent) {
-    container.value.removeEventListener("touchmove", drag)
+    container.value?.removeEventListener("touchmove", drag)
   }
 
-  container.value.classList.remove("selected-cities_moved")
+  container.value?.classList.remove("selected-cities_moved")
 
   divs.value.forEach((el: Element) => {
     el.classList.remove("selected-cities__city_selected")
@@ -116,24 +122,34 @@ function deleteHandler(i: number) {
     >
       <TransitionGroup name="fade" tag="div"> 
         <div 
-          v-if="!cities?.length"
+          v-if="!selected?.length"
           class="selected-cities__no-city"
+          key="no-city"
         >
           <span>No city selected</span>
         </div>
         <div 
           class="selected-cities__city-wrapper"
-          v-for="(city, i) in cities"
+          v-for="(city, i) in selected"
           :key="city"
-          :ref="el => { if (el) divs[i] = el as Element}"
+          :ref="(
+            // @ts-ignore
+            (el) => { if (el) divs[i] = el as Element}
+          )"
         >
           <div class="selected-cities__city">
             <IconHamburger
               class="selected-cities__dragger"
-              @mousedown="(e) => dragStart(e, i)"
-              @touchstart="(e) => dragStart(e, i)"
+              @mousedown="(
+                // @ts-ignore
+                (e: MouseEvent) => dragStart(e, i)
+              )"
+              @touchstart.passive="(
+                // @ts-ignore
+                (e: TouchEvent) => dragStart(e, i)
+              )"
             />
-            <span>{{JSON.parse(city).name}}, {{JSON.parse(city).country}}</span>
+            <span>{{cityName(city)}}</span>
             <IconTrash 
               class="selected-cities__delete"
               @click="deleteHandler(i)"

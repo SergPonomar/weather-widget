@@ -21,7 +21,9 @@ watch(inputValue, (val) => {
   if (val.length > 0) {
     timeout.value = setTimeout(() => {
       getCities(val)
-        .then((res) => res.json())
+        .then((res) => {
+          if (res.ok) return res.json()
+        })
         .then((res) => {
           cityList.value = res
         })
