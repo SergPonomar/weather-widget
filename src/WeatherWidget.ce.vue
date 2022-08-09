@@ -31,7 +31,7 @@ function getUserLocation() {
       getNameByCoords({lat: pos.coords.latitude, lon: pos.coords.longitude})
         .then((res) => res.json())
         .then((res) => {
-          userCities.value.push(JSON.stringify(res[0]))
+          userCities.value = [JSON.stringify(res[0])]
         })
     }, errorFunc)
   } else {
