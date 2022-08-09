@@ -1,5 +1,5 @@
 import { defineCustomElement } from 'vue'
-import App from './App.ce.vue'
+import WeatherWidget from './WeatherWidget.ce.vue'
 import AddLocation from './components/AddLocation.ce.vue'
 import SelectedCities from './components/SelectedCities.ce.vue'
 import CityWeather from './components/CityWeather.ce.vue'
@@ -12,4 +12,4 @@ customElements.define('ce-selected-cities', defineCustomElement(SelectedCities))
 customElements.define('ce-city-weather', defineCustomElement(CityWeather))
 customElements.define('ce-settings-button', defineCustomElement(SettingsButton))
 customElements.define('ce-loader', defineCustomElement(LoaderIcon))
-customElements.define('weather-widget', defineCustomElement(App))
+customElements.define('weather-widget', defineCustomElement(WeatherWidget))

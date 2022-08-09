@@ -1,18 +1,14 @@
 <script setup lang="ts">
-import { computed, ref, watch, watchEffect } from 'vue'
-import type { Ref } from 'vue'
 import IconSettings from './icons/IconSettings.vue'
 import IconClose from './icons/IconClose.vue'
 
-const props = defineProps<{
+defineProps<{
   closed?: boolean | string
 }>()
 
 const emit = defineEmits<{
   (e: 'toggle'): void
 }>()
-
-//const isClosed = computed(() => props.closed?.value)
 
 function handler() {
   emit('toggle')

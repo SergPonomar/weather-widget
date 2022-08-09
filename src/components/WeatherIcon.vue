@@ -54,7 +54,10 @@ const icon = computed(() => {
 </script>
 
 <template>
-	<component :is="icon" class="tab"></component>
+	<component 
+		:is="icon" 
+		class="tab"
+	/>
 </template>
 
 <style>

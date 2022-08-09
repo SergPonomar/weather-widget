@@ -114,7 +114,9 @@ function deleteHandler(i: number) {
     @mouseup="dragEnd"
     @touchend="dragEnd"
   >
-    <h1 class="selected-cities__title">Settings</h1>
+    <h1 class="selected-cities__title">
+      Settings
+    </h1>
     <div 
       ref="container"
       class="selected-cities__container"
@@ -129,13 +131,13 @@ function deleteHandler(i: number) {
           <span>No city selected</span>
         </div>
         <div 
-          class="selected-cities__city-wrapper"
           v-for="(city, i) in selected"
           :key="city"
           :ref="(
             // @ts-ignore
             (el) => { if (el) divs[i] = el as Element}
           )"
+          class="selected-cities__city-wrapper"
         >
           <div class="selected-cities__city">
             <IconHamburger
@@ -149,7 +151,7 @@ function deleteHandler(i: number) {
                 (e: TouchEvent) => dragStart(e, i)
               )"
             />
-            <span>{{cityName(city)}}</span>
+            <span>{{ cityName(city) }}</span>
             <IconTrash 
               class="selected-cities__delete"
               @click="deleteHandler(i)"

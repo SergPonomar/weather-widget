@@ -9,12 +9,12 @@ const getCities = function(query: string) {
 }
 
 const getCurrent = function(coordinates: {lat: number, lon: number}) {
-	let {lat, lon} = coordinates
+	const {lat, lon} = coordinates
 	return fetch(`${CURRENT_API_URL}?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`)
 }
 
 const getNameByCoords = function(coordinates: {lat: number, lon: number}) {
-	let {lat, lon} = coordinates
+	const {lat, lon} = coordinates
 	return fetch(`${REVERSE_GEO_API_URL}?lat=${lat}&lon=${lon}&limit=1&appid=${API_KEY}`)
 }
 

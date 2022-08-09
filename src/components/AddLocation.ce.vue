@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch, watchEffect } from 'vue'
+import { computed, ref, watch } from 'vue'
 import type { Ref } from 'vue'
 import { getCities } from '../utils/weatherApi'
 
@@ -40,18 +40,20 @@ function handler(city: City) {
 
 <template>
   <div class="add-location">
-    <h2 class="add-location__title">Add location:</h2>
+    <h2 class="add-location__title">
+      Add location:
+    </h2>
     <input 
+      class="add-location__input"
       v-model="inputValue"
       placeholder="search city"
-      class="add-location__input"
     />
     <div 
+      class="add-location__option"
       v-for="city in cityList"
       @click="handler(city)"
-      class="add-location__option"
     >
-      {{city.name}}, {{city.country}}
+      {{ city.name }}, {{ city.country }}
     </div>
   </div>
 </template>
