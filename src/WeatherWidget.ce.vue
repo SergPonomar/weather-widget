@@ -4,7 +4,7 @@ import { getNameByCoords } from './utils/weatherApi'
 import type { Ref } from 'vue'
 
 const userCities: Ref<Array<string>> = ref([])
-const settingsIsOpen: Ref<boolean> = ref(false)
+const settingsIsOpen: Ref<boolean | undefined> = ref()
 const selCities: Ref<Element | null> = ref(null)
 const closeButton = ref()
 

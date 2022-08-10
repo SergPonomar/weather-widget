@@ -210,7 +210,7 @@ function deleteHandler(i: number) {
 }
 
 /* declare transition */
-.fade-move {
+.fade-move:not(.selected-cities__no-city)  {
   transition: all 0.5s ease;
 }
 

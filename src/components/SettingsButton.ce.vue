@@ -3,7 +3,7 @@ import IconSettings from './icons/IconSettings.vue'
 import IconClose from './icons/IconClose.vue'
 
 defineProps<{
-  closed?: boolean | string
+  closed?: boolean
 }>()
 
 const emit = defineEmits<{
